@@ -153,7 +153,7 @@ for simulation_design=1:7,
     [Z,xi,theta]=gen_potential(n,psi,gamma,lambda,sig_theta,sig_xi,KZ);
     
     % calculate theta_causal and Omega
-    theta_causal=mean(phi); % correct this
+    theta_causal=mean(theta); % correct this --- WHY is this wrong?
     Omega=zeros(KZ+3,KZ+3);
     
     theta_out=zeros(Nsim,4);
@@ -166,7 +166,7 @@ for simulation_design=1:7,
     Delta_Z=Delta_ehw-(psi'*psi);
     Delta_cond=Delta_ehw-(psi'*psi+sig_eps*sig_eps);
     %pause
-    H=1;               % variance of X, so with X randn(n,1), this is equal to 1
+    H=1;               % variance of X, so with X randn(n,1), this is equal to 1 (in paper, H is denoted as capital Gamma)
     V_ehw=inv(H)*Delta_ehw*inv(H)/(rho*n);
     V_desc=(1-rho)*inv(H)*Delta_ehw*inv(H)/(rho*n);
     V_causal_sample=inv(H)*Delta_cond*inv(H)/(rho*n);

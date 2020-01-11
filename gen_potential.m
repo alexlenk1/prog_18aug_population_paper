@@ -1,47 +1,26 @@
+
+function [Z,xi,theta]=gen_potential(n,psi,gamma,lambda,sig_theta,sig_xi,KZ);
+
 % generating population data
 
-function [Z,alpha,phi]=gen_potential(n,psi,gamma,xi,sig_eps,sig_eta,KZ);
+%input
+%n = population size
+%psi = parameter determining the dependence between Z and theta
+%gamma = parameter determining the dependence between Z and xi
+%lambda = parameter determining the dependence between Z and U
+%sig_theta = sd of theta 
+%sig_xi = sd of xi
+%KZ = dimension of Z, excluding constant term
 
-% generate the potential outcome functions
-% and covariates Z
-% Y(u)=alpha+u*phi
-% alpha is n-vector
-% phi is n-vector
-% n is population size
+%output 
+%Z = n by (KZ+1) matrix of fixed attributes for population n
+%xi = the intercept vector of size n in the potential outcome function
+%theta = treatment effect vector of size n  in the potential outcome function
 
+Z=[ones(n,1),randn(n,KZ)];  
 
-Z=[ones(n,1),randn(n,KZ)];   % exogenous fixed features
-ZZ=Z'*Z/n; 
-Mean_Z=mean(Z);
+xi_error=randn(n,1)*sig_xi; % xi_error is N(0, (sig_xi)^2 )
+theta_error=randn(n,1)*sig_theta; % theta_error is N(0, (sig_theta)^2 )
 
-eta=randn(n,1)*sig_eta;
-eps=randn(n,1)*sig_eps;
-
-alpha=Z*gamma+eta;  % intercept for potential outcomes, depends on features
-phi=Z*psi+eps;      % treatment effect, depents on features
-
-
-
-if false,
-U=Z*xi+randn(n,1);       % treatment
-X=U-Z*xi;                % adjusted treatment
-[nZ,KZ]=size(Z);
-Y=alpha+U*phi;  % realized outcome
-
-
-W=[Y X Z]'*[Y X Z]/n;
-EXX=1;     % expected value of X*X
-EXZ=[0 0]; % expected value of X*Z
-EXY=theta+Mean_Z*phi;
-EYZ=xi'*ZZ*theta+ZZ*gamma+Mean_Z*xi'*ZZ*psi+Z'*eta/n;
-EYY=0;
-Omega=[EYY EXY EYZ; EXY EXX EXZ; EYZ' EXZ' Z'*Z/n];
-
-Exp_U=mean_Z*xi;
-
-
-% the estimands
-theta_causal=tau+(exp_U*ones(1,KZ))*(Mean_Z')*gamma;
-theta_desc=inv([U Z]'*[U Z])*([U Z]'*Y);
-theta_desc=theta_desc(1,1);
-end
+xi=Z*gamma+xi_error;  % intercept for potential outcomes, distributed as N(Z*gamma, var(xi_error) ) 
+theta=Z*psi+theta_error;      % treatment effect, distributed as N(Z*psi, var(theta_error) ) 

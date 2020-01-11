@@ -60,8 +60,8 @@ for simulation_design=1:7,
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
+       gamma=zeros(KZ+1,1);
        lambda=zeros(KZ+1,1);
-       xi=zeros(KZ+1,1);
        sig_xi=1;
        sig_theta=1;  
     end
@@ -73,8 +73,8 @@ for simulation_design=1:7,
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
+       gamma=zeros(KZ+1,1);
        lambda=zeros(KZ+1,1);
-       xi=zeros(KZ+1,1);
        sig_xi=1;
        sig_theta=1;  
     end
@@ -86,8 +86,8 @@ for simulation_design=1:7,
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
+       gamma=zeros(KZ+1,1);
        lambda=zeros(KZ+1,1);
-       xi=zeros(KZ+1,1);
        sig_xi=1;
        sig_theta=1;  
     end
@@ -99,8 +99,8 @@ for simulation_design=1:7,
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
+       gamma=zeros(KZ+1,1);
        lambda=zeros(KZ+1,1);
-       xi=zeros(KZ+1,1);
        sig_xi=1;
        sig_theta=1; 
     end
@@ -111,8 +111,8 @@ for simulation_design=1:7,
        rho=0.01; 
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
+       gamma=zeros(KZ+1,1);
        lambda=zeros(KZ+1,1);
-       xi=zeros(KZ+1,1);
        sig_xi=1;
        sig_theta=1; 
     end
@@ -124,8 +124,8 @@ for simulation_design=1:7,
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
+       gamma=zeros(KZ+1,1);
        lambda=zeros(KZ+1,1);
-       xi=zeros(KZ+1,1);
        sig_xi=1;
        sig_theta=0;  
     end
@@ -136,8 +136,8 @@ for simulation_design=1:7,
        rho=0.01; 
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
+       gamma=zeros(KZ+1,1);
        lambda=zeros(KZ+1,1);
-       xi=zeros(KZ+1,1);
        sig_xi=1;
        sig_theta=0;  
     end

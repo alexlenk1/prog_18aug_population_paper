@@ -54,105 +54,103 @@ tabel=zeros(39,3);   % matrix containing output for tables
 
 for simulation_design=1:7,
     if simulation_design==1,
-       KZ=1;      % 10
-       EN=1000;   % 100
-       rho=0.01;  % 1
+       KZ=1;      
+       EN=1000;   
+       rho=0.01; 
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
-       gamma=zeros(KZ+1,1);
+       lambda=zeros(KZ+1,1);
        xi=zeros(KZ+1,1);
-       sig_eta=1;
-       sig_eps=1;  % 0
+       sig_xi=1;
+       sig_theta=1;  
     end
     
     if simulation_design==2,
-       KZ=10;      % 10
-       EN=1000;   % 100
-       rho=0.01;  % 1
+       KZ=10;      
+       EN=1000;   
+       rho=0.01; 
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
-       gamma=zeros(KZ+1,1);
+       lambda=zeros(KZ+1,1);
        xi=zeros(KZ+1,1);
-       sig_eta=1;
-       sig_eps=1;  % 0
+       sig_xi=1;
+       sig_theta=1;  
     end
 
     if simulation_design==3,
-       KZ=1;      % 10
-       EN=100;   % 100
-       rho=0.01;  % 1
+       KZ=1;     
+       EN=100;  
+       rho=0.01;  
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
-       gamma=zeros(KZ+1,1);
+       lambda=zeros(KZ+1,1);
        xi=zeros(KZ+1,1);
-       sig_eta=1;
-       sig_eps=1;  % 0
+       sig_xi=1;
+       sig_theta=1;  
     end
     
     if simulation_design==4,
-       KZ=1;      % 10
-       EN=1000;   % 100
-       rho=1;  % 1
+       KZ=1;     
+       EN=1000;  
+       rho=1; 
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
-       gamma=zeros(KZ+1,1);
+       lambda=zeros(KZ+1,1);
        xi=zeros(KZ+1,1);
-       sig_eta=1;
-       sig_eps=1;  % 0
+       sig_xi=1;
+       sig_theta=1; 
     end
     
     if simulation_design==5,
-       KZ=1;      % 10
-       EN=1000;   % 100
-       rho=0.01;  % 1
+       KZ=1;      
+       EN=1000;   
+       rho=0.01; 
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
-       %psi(2,1)=2;
-       gamma=zeros(KZ+1,1);
+       lambda=zeros(KZ+1,1);
        xi=zeros(KZ+1,1);
-       sig_eta=1;
-       sig_eps=1;  % 0
+       sig_xi=1;
+       sig_theta=1; 
     end
     
     if simulation_design==6,
-       KZ=1;      % 10
-       EN=1000;   % 100
-       rho=0.01;  % 1
+       KZ=1;     
+       EN=1000;  
+       rho=0.01;  
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
        psi(2,1)=2;
-       gamma=zeros(KZ+1,1);
+       lambda=zeros(KZ+1,1);
        xi=zeros(KZ+1,1);
-       sig_eta=1;
-       sig_eps=0;  % 0
+       sig_xi=1;
+       sig_theta=0;  
     end
     
     if simulation_design==7,
-       KZ=1;      % 10
-       EN=1000;   % 100
-       rho=0.01;  % 1
+       KZ=1;    
+       EN=1000;   
+       rho=0.01; 
        n=round(EN/rho);
        psi=zeros(KZ+1,1);   
-       %psi(2,1)=2;
-       gamma=zeros(KZ+1,1);
+       lambda=zeros(KZ+1,1);
        xi=zeros(KZ+1,1);
-       sig_eta=1;
-       sig_eps=0;  % 0
+       sig_xi=1;
+       sig_theta=0;  
     end
     
-    % given the simulation design, we first generate the population of
+    % Given the simulation design, we first generate the population of
     % units. There are n units in ths population, each characterized by
     % three variables:
     % 1. Z_i, a vector of length KZ+1, with the first element equal to 1
-    % 2. alpha_i, the intercept in the potential outcome function 
-    % 3. phi_i, the slope coefficient in the potential outcome function
+    % 2. xi_i, the intercept in the potential outcome function 
+    % 3. theta_i, the slope coefficient in the potential outcome function
     % the potential outcome function is
-    % y(x)=alpha_i+phi_i*x
-    [Z,alpha,phi]=gen_potential(n,psi,gamma,xi,sig_eps,sig_eta,KZ);
+    % y(x)=xi_i+theta_i*x
+    [Z,xi,theta]=gen_potential(n,psi,gamma,lambda,sig_theta,sig_xi,KZ);
     
     % calculate theta_causal and Omega
     theta_causal=mean(phi); % correct this

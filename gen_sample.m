@@ -1,5 +1,5 @@
 
-function       [YR,XR,ZR,W,UR,R]=gen_sample(rho,Y,X,Z,U);
+function       [YR,XR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U);
 
 % generating sample data
  

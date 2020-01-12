@@ -148,19 +148,24 @@ for simulation_design=1:7,
     % 1. Z_i, a vector of length KZ+1, with the first element equal to 1
     % 2. xi_i, the intercept in the potential outcome function 
     % 3. theta_i, the slope coefficient in the potential outcome function
-    % the potential outcome function is
-    % y(x)=xi_i+theta_i*x
+   
     [Z,xi,theta]=gen_potential(n,psi,gamma,lambda,sig_theta,sig_xi,KZ);
     
-    % calculate theta_causal and Omega
-    theta_causal=mean(theta); % correct this --- WHY is this wrong?
-    Omega=zeros(KZ+3,KZ+3);
+    % Given our population, we can calculate the corresponding potential outcomes for each unit.
+    % The potential outcome function is
+    % y(x)=xi_i+theta_i*x
     
-    theta_out=zeros(Nsim,4);
-    out=zeros(Nsim,11);
-    coverage=zeros(Nsim,33);
-    
-    [Z,alpha,phi];
+    U=Z*lambda+randn(n,1); % -1+2*(rand(n,1)<0.5); % raw treatment
+    X=U-Z*lambda;          % adjusted treatment (in our case, the same since lambda =0)
+
+    Y=xi+X.*theta;    % realized outcome
+        
+    % We now calculate the estimands for theta causal and theta descriptive: 
+    theta_causal=mean(theta); % correct this --- WHY is this wrong? This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
+
+    beta=inv([X Z]'*[X Z])*([X Z]'*Y); % formula (3.3)
+    theta_desc=beta(1,1);    
+      
     
     Delta_ehw=1+3*(psi'*psi+sig_eps*sig_eps);
     Delta_Z=Delta_ehw-(psi'*psi);
@@ -181,16 +186,17 @@ for simulation_design=1:7,
     se_Z_causal_sample=sqrt(V_Z_causal_sample);
     se_Z_causal=sqrt(V_Z_causal);
     
+    theta_out=zeros(Nsim,4);
+    out=zeros(Nsim,11);
+    coverage=zeros(Nsim,33);
+    
     for isim=1:Nsim
-        [YR,XR,ZR,W,UR,R,TOmega,theta_desc,theta_causal_sample]=gen_sample(alpha,phi,Z,rho,xi);
+        [YR,XR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U);
         
-        theta_causal_sample=R'*phi/sum(R);
+        theta_causal_sample=mean(theta(R,1)); %This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
         
-        beta=inv([UR ZR]'*[UR ZR])*([UR ZR]'*YR);
         beta=inv([XR ZR]'*[XR ZR])*([XR ZR]'*YR);
         hat_theta=beta(1,1);    % calculate theta estimator
-        
-        
         
         se_hat_ehw=se_ehw_calc(YR,UR,ZR);
         se_hat_desc=sqrt(1-rho)*se_hat_ehw;

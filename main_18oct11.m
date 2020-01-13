@@ -166,12 +166,12 @@ for simulation_design=1:7,
     beta=inv([X Z]'*[X Z])*([X Z]'*Y); % formula (3.3)
     theta_desc=beta(1,1);    
       
-    
+    % We now calculate the true variance of the different estimators
     Delta_ehw=1+3*(psi'*psi+sig_eps*sig_eps);
     Delta_Z=Delta_ehw-(psi'*psi);
     Delta_cond=Delta_ehw-(psi'*psi+sig_eps*sig_eps);
-    %pause
-    H=1;               % variance of X, so with X randn(n,1), this is equal to 1 (in paper, H is denoted as capital Gamma)
+   
+    H=1;  % variance of X, so with X randn(n,1), this is equal to 1 (in paper, H is denoted as capital Gamma)
     V_ehw=inv(H)*Delta_ehw*inv(H)/(rho*n);
     V_desc=(1-rho)*inv(H)*Delta_ehw*inv(H)/(rho*n);
     V_causal_sample=inv(H)*Delta_cond*inv(H)/(rho*n);
@@ -195,9 +195,12 @@ for simulation_design=1:7,
         
         theta_causal_sample=mean(theta(R,1)); %This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
         
-        beta=inv([XR ZR]'*[XR ZR])*([XR ZR]'*YR);
+        beta=inv([UR ZR]'*[UR ZR])*([UR ZR]'*YR);
         hat_theta=beta(1,1);    % calculate theta estimator
         
+        %Sample standard errors
+        
+        %LOOKS LIKE WE PERFORM THE SIMULATIONS WITH UR and NOT WITH XR, RIGHT? 
         se_hat_ehw=se_ehw_calc(YR,UR,ZR);
         se_hat_desc=sqrt(1-rho)*se_hat_ehw;
         se_hat_Z=se_z_calc(YR,UR,ZR);

@@ -1,8 +1,6 @@
 function se_ehw=se_ehw_calc(Y,X,Z)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
 
-% calculating the eicker-huber-white variance for coefficient on X (scalar)
+% Calculates the Eicker-Huber-White variance for coefficient on X (scalar)
 
 W=[X,Z];
 [N,KW]=size(W);

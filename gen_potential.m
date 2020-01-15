@@ -1,5 +1,5 @@
 
-function [Z,xi,theta]=gen_potential(n,psi,gamma,lambda,sig_theta,sig_xi,KZ);
+function [Z,xi,theta]=gen_population(n,psi,gamma,lambda,sig_theta,sig_xi,KZ);
 
 % generating population data
 

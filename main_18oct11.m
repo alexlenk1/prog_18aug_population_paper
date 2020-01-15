@@ -167,11 +167,13 @@ for simulation_design=1:7,
     theta_desc=beta(1,1);    
       
     % We now calculate the true variance of the different estimators
-    Delta_ehw=1+3*(psi'*psi+sig_eps*sig_eps);
+    Delta_ehw=1+3*(psi'*psi+sig_theta*sig_theta);
     Delta_Z=Delta_ehw-(psi'*psi);
-    Delta_cond=Delta_ehw-(psi'*psi+sig_eps*sig_eps);
+    Delta_cond=Delta_ehw-(psi'*psi+sig_theta*sig_theta);
    
     H=1;  % variance of X, so with X randn(n,1), this is equal to 1 (in paper, H is denoted as capital Gamma)
+    
+    % Notice that these are already the true variances for (theta_hat - theta_true) instead of sqrt(N)(theta_hat - theta_true) 
     V_ehw=inv(H)*Delta_ehw*inv(H)/(rho*n);
     V_desc=(1-rho)*inv(H)*Delta_ehw*inv(H)/(rho*n);
     V_causal_sample=inv(H)*Delta_cond*inv(H)/(rho*n);
@@ -186,17 +188,23 @@ for simulation_design=1:7,
     se_Z_causal_sample=sqrt(V_Z_causal_sample);
     se_Z_causal=sqrt(V_Z_causal);
     
-    theta_out=zeros(Nsim,4);
-    out=zeros(Nsim,11);
-    coverage=zeros(Nsim,33);
+    %Define Matrices for Stroring Output from Each Simulation 
+    
+    theta_out=zeros(Nsim,4);  % this records estimated theta and how it deviates from the 3 theta estimators defined above
+    out=zeros(Nsim,11); %  this records different variance estimators (both the true ones and the estimated ones)
+    coverage=zeros(Nsim,33); % this records coverage rates for all variance-estimator combinations
     
     for isim=1:Nsim
         [YR,XR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U);
         
+        N = sum(R) %sample size
         theta_causal_sample=mean(theta(R,1)); %This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
         
-        beta=inv([UR ZR]'*[UR ZR])*([UR ZR]'*YR);
-        hat_theta=beta(1,1);    % calculate theta estimator
+        Lambda_hat=(inv(ZR'*ZR)*(ZR'*UR)); % Calculating estimated X (which is U net of correlation with X, see p.11)
+        XR=UR-ZR*Lambda_hat;
+       
+        beta_tilde=inv([XR ZR]'*[XR ZR])*([XR ZR]'*YR); % Calculating theta tilde and gamma tilde as on p.11
+        hat_theta=beta(1,1);    % Remember that theta_hat = theta_tilde (where theta_hat obtained in a regression of YR on UR and ZR)
         
         %Sample standard errors
         

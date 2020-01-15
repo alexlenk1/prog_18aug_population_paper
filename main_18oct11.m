@@ -1,47 +1,22 @@
-% main program, April 10th, 2014
+% This program reproduces the Simulation Table 4 on p.39
+% The functions that are called are:
+
+%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% IMPLEMENTATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 clear   % ensure that the workspace is empty
 
-load seed_oct2
+load seed_oct2 % loading random seed for reproducibility
 
-application=false;    % false if you want to run simulations,
-                      % true if you want to run the application with the
-                      % nls data
-                      
 Nboot=1000;           % number of bootstrap replications
 
-%  application to nls data
-if application
-   load nls_2012.txt
-   luwe=nls_2012(:,1);
-   educ=nls_2012(:,2);
-   exper=nls_2012(:,3);
-   age=nls_2012(:,4);
-   fed=nls_2012(:,5);
-   moed=nls_2012(:,6);
-   kww=nls_2012(:,7);
-   iq=nls_2012(:,8);
-   clear nls_2012;
-   
-   U=educ;
-   Z=[ones(length(educ),1),age,fed,moed,kww,iq];
-   Y=luwe;
-   beta=inv([U Z]'*[U Z])*([U Z]'*Y)
-   theta=beta(1,1);
-   
-   se_ehw=se_ehw_calc(Y,U,Z);
-   se_z=se_z_calc(Y,U,Z);
-   [lcb_boot,ucb_boot,se_boot]=se_boot_calc(Y,U,Z,Nboot)
-   % point estimate, ehw standard errors, proposed se_z standard errors,
-   % bootstrap
-   'est se_ehw se_z se_boot'
-   [theta,se_ehw,se_z,se_boot]
-
-   [mean(luwe),size(luwe)]
-end      % end of nls application
-
 % parameters for simulations
-Nsim=50000;      % number of simulations. Should correspond to number of simulations in table
-csim=1000;       % number of simulations before output is sent to screen for monitoring. Not important.
+Nsim=50000;      % number of simulations
+csim=1000;       % number of simulations before output is sent to screen for monitoring
 EN=1000;         % expected number of observations in the sample.
                  % if the population size is n, and the sampling rate is
                  % rho, EN is approximately rho*n. EN and rho are fixed in the
@@ -53,7 +28,7 @@ tabel=zeros(39,3);   % matrix containing output for tables
                      % there are seven simulation designs
 
 for simulation_design=1:7,
-    if simulation_design==1,
+    if simulation_design==1
        KZ=1;      
        EN=1000;   
        rho=0.01; 
@@ -66,7 +41,7 @@ for simulation_design=1:7,
        sig_theta=1;  
     end
     
-    if simulation_design==2,
+    if simulation_design==2
        KZ=10;      
        EN=1000;   
        rho=0.01; 
@@ -79,7 +54,7 @@ for simulation_design=1:7,
        sig_theta=1;  
     end
 
-    if simulation_design==3,
+    if simulation_design==3
        KZ=1;     
        EN=100;  
        rho=0.01;  
@@ -92,7 +67,7 @@ for simulation_design=1:7,
        sig_theta=1;  
     end
     
-    if simulation_design==4,
+    if simulation_design==4
        KZ=1;     
        EN=1000;  
        rho=1; 
@@ -105,7 +80,7 @@ for simulation_design=1:7,
        sig_theta=1; 
     end
     
-    if simulation_design==5,
+    if simulation_design==5
        KZ=1;      
        EN=1000;   
        rho=0.01; 
@@ -117,7 +92,7 @@ for simulation_design=1:7,
        sig_theta=1; 
     end
     
-    if simulation_design==6,
+    if simulation_design==6
        KZ=1;     
        EN=1000;  
        rho=0.01;  
@@ -149,44 +124,48 @@ for simulation_design=1:7,
     % 2. xi_i, the intercept in the potential outcome function 
     % 3. theta_i, the slope coefficient in the potential outcome function
    
-    [Z,xi,theta]=gen_potential(n,psi,gamma,lambda,sig_theta,sig_xi,KZ);
+    [Z,xi,theta]=gen_population(n,psi,gamma,lambda,sig_theta,sig_xi,KZ);
     
-    % Given our population, we can calculate the corresponding potential outcomes for each unit.
-    % The potential outcome function is
+    % Given our population, we can calculate the corresponding realized outcomes for each unit.
+    % The potential outcome function is:
+    % y(u)=xi_i+theta_i*u
+    % After removing the correlation between U and X, the potential outcome function is: 
     % y(x)=xi_i+theta_i*x
     
-    U=Z*lambda+randn(n,1); % -1+2*(rand(n,1)<0.5); % raw treatment
-    X=U-Z*lambda;          % adjusted treatment (in our case, the same since lambda =0)
+    U=Z*lambda+randn(n,1); % raw treatment, distributed N(Z*lambda, 1)
+    X=U-Z*lambda;          % adjusted treatment (after removing correlation from Z); in our case since lambda=0, X=U
 
-    Y=xi+X.*theta;    % realized outcome
+    Y=xi+X.*theta;         % realized outcome
         
     % We now calculate the estimands for theta causal and theta descriptive: 
-    theta_causal=mean(theta); % correct this --- WHY is this wrong? This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
+    
+    theta_causal=mean(theta); % [This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0]
 
     beta=inv([X Z]'*[X Z])*([X Z]'*Y); % formula (3.3)
     theta_desc=beta(1,1);    
       
-    % We now calculate the true variance of the different estimators
+    % We now calculate the true variances of the different estimators.
+    % Notice these are square-root-N variances as on p.18.
     Delta_ehw=1+3*(psi'*psi+sig_theta*sig_theta);
     Delta_Z=Delta_ehw-(psi'*psi);
     Delta_cond=Delta_ehw-(psi'*psi+sig_theta*sig_theta);
    
-    H=1;  % variance of X, so with X randn(n,1), this is equal to 1 (in paper, H is denoted as capital Gamma)
+    H=1;  % variance of X, so with X being standard normal, this is equal to 1 (in paper, H is denoted as capital Gamma)
+    V_ehw=inv(H)*Delta_ehw*inv(H);
+    V_desc=(1-rho)*inv(H)*Delta_ehw*inv(H);
+    V_causal_sample=inv(H)*Delta_cond*inv(H);
+    V_causal=inv(H)*(rho*Delta_cond+(1-rho)*Delta_ehw)*inv(H);
+    V_Z_causal_sample=inv(H)*Delta_Z*inv(H);
+    V_Z_causal=inv(H)*(rho*Delta_Z+(1-rho)*Delta_ehw)*inv(H);
     
-    % Notice that these are already the true variances for (theta_hat - theta_true) instead of sqrt(N)(theta_hat - theta_true) 
-    V_ehw=inv(H)*Delta_ehw*inv(H)/(rho*n);
-    V_desc=(1-rho)*inv(H)*Delta_ehw*inv(H)/(rho*n);
-    V_causal_sample=inv(H)*Delta_cond*inv(H)/(rho*n);
-    V_causal=inv(H)*(rho*Delta_cond+(1-rho)*Delta_ehw)*inv(H)/(rho*n);
-    V_Z_causal_sample=inv(H)*Delta_Z*inv(H)/(rho*n);
-    V_Z_causal=inv(H)*(rho*Delta_Z+(1-rho)*Delta_ehw)*inv(H)/(rho*n);
-    
-    se_ehw=sqrt(V_ehw);
-    se_desc=sqrt(V_desc);
-    se_causal_sample=sqrt(V_causal_sample);
-    se_causal=sqrt(V_causal);
-    se_Z_causal_sample=sqrt(V_Z_causal_sample);
-    se_Z_causal=sqrt(V_Z_causal);
+    % We now calculate the (expected) true standard errors of the estimators (these are no longer square-root-N).
+    % These are expected true standard errors as we divide by expected rather than true sample size. 
+    se_ehw=sqrt(V_ehw/(rho*n));
+    se_desc=sqrt(V_desc/(rho*n));
+    se_causal_sample=sqrt(V_causal_sample/(rho*n));
+    se_causal=sqrt(V_causal/(rho*n));
+    se_Z_causal_sample=sqrt(V_Z_causal_sample/(rho*n));
+    se_Z_causal=sqrt(V_Z_causal/(rho*n));
     
     %Define Matrices for Stroring Output from Each Simulation 
     
@@ -198,23 +177,20 @@ for simulation_design=1:7,
         [YR,XR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U);
         
         N = sum(R) %sample size
+        rho_hat = N/n
         theta_causal_sample=mean(theta(R,1)); %This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
         
         Lambda_hat=(inv(ZR'*ZR)*(ZR'*UR)); % Calculating estimated X (which is U net of correlation with X, see p.11)
         XR=UR-ZR*Lambda_hat;
        
-        beta_tilde=inv([XR ZR]'*[XR ZR])*([XR ZR]'*YR); % Calculating theta tilde and gamma tilde as on p.11
+        beta_hat=inv([XR ZR]'*[XR ZR])*([XR ZR]'*YR); % Calculating theta hat and gamma hat as on p.11
         hat_theta=beta(1,1);    % Remember that theta_hat = theta_tilde (where theta_hat obtained in a regression of YR on UR and ZR)
         
-        %Sample standard errors
+        % Sample standard errors
+        [se_hat_ehw,se_hat_desc,se_hat_causal_sample,se_hat_causal]=se_causal_z_calc(YR,XR,ZR,beta_hat,rho_hat,N);
+        se_hat_boot=se_boots_calc(YR,XR,ZR,Nboot,N,se_hat_ehw,hat_theta);
         
-        %LOOKS LIKE WE PERFORM THE SIMULATIONS WITH UR and NOT WITH XR, RIGHT? 
-        se_hat_ehw=se_ehw_calc(YR,UR,ZR);
-        se_hat_desc=sqrt(1-rho)*se_hat_ehw;
-        se_hat_Z=se_z_calc(YR,UR,ZR);
-        se_hat_causal_Z=se_causal_z_calc(YR,UR,ZR,rho);
-        [lcb_boot,ucb_boot,se_hat_boot]=se_boot_calc(YR,UR,ZR,Nboot);
-        
+        % Calculating nominal coverage (ie, using (expected) true variances) 
         in_ehw_desc=abs(hat_theta-theta_desc)<1.96*se_ehw;
         in_ehw_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_ehw;
         in_ehw_causal=abs(hat_theta-theta_causal)<1.96*se_ehw;
@@ -239,6 +215,7 @@ for simulation_design=1:7,
         in_Z_causal_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_Z_causal;
         in_Z_causal_causal=abs(hat_theta-theta_causal)<1.96*se_Z_causal;
  
+        % Calculating sample coverage (ie, using estimated variances)
         in_hat_ehw_desc=abs(hat_theta-theta_desc)<1.96*se_hat_ehw;
         in_hat_ehw_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_hat_ehw;
         in_hat_ehw_causal=abs(hat_theta-theta_causal)<1.96*se_hat_ehw;
@@ -247,23 +224,23 @@ for simulation_design=1:7,
         in_hat_desc_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_hat_desc;
         in_hat_desc_causal=abs(hat_theta-theta_causal)<1.96*se_hat_desc;
  
-        in_hat_Z_desc=abs(hat_theta-theta_desc)<1.96*se_hat_Z;
-        in_hat_Z_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_hat_Z;
-        in_hat_Z_causal=abs(hat_theta-theta_causal)<1.96*se_hat_Z;
+        in_hat_causal_sample_desc=abs(hat_theta-theta_desc)<1.96*se_hat_causal_sample;
+        in_hat_causal_sample_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_hat_causal_sample;
+        in_hat_causal_sample_causal=abs(hat_theta-theta_causal)<1.96*se_hat_causal_sample;
  
-        in_hat_causal_Z_desc=abs(hat_theta-theta_desc)<1.96*se_hat_causal_Z;
-        in_hat_causal_Z_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_hat_causal_Z;
-        in_hat_causal_Z_causal=abs(hat_theta-theta_causal)<1.96*se_hat_causal_Z;
+        in_hat_causal_desc=abs(hat_theta-theta_desc)<1.96*se_hat_causal;
+        in_hat_causal_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_hat_causal;
+        in_hat_causal_causal=abs(hat_theta-theta_causal)<1.96*se_hat_causal;
  
         in_hat_boot_desc=abs(hat_theta-theta_desc)<1.96*se_hat_boot;
         in_hat_boot_causal_sample=abs(hat_theta-theta_causal_sample)<1.96*se_hat_boot;
         in_hat_boot_causal=abs(hat_theta-theta_causal)<1.96*se_hat_boot;
   
         
-        % collecting output
+        % Collecting output
         theta_out(isim,1:4)=[hat_theta-theta_desc,hat_theta-theta_causal_sample,hat_theta-theta_causal,hat_theta];
         
-        out(isim,:)=[se_ehw,se_desc,se_causal_sample,se_causal,se_Z_causal_sample,se_Z_causal,se_hat_ehw,se_hat_desc,se_hat_Z,se_hat_boot,se_hat_causal_Z];
+        out(isim,:)=[se_ehw,se_desc,se_causal_sample,se_causal,se_Z_causal_sample,se_Z_causal,se_hat_ehw,se_hat_desc,se_hat_causal_sample,se_hat_boot,se_hat_causal];
         
         in_ehw=[in_ehw_desc,in_ehw_causal_sample,in_ehw_causal];
         in_desc=[in_desc_desc,in_desc_causal_sample,in_desc_causal];
@@ -273,10 +250,10 @@ for simulation_design=1:7,
         in_Z_causal=[in_Z_causal_desc,in_Z_causal_causal_sample,in_Z_causal_causal];
         in_hat_ehw=[in_hat_ehw_desc,in_hat_ehw_causal_sample,in_hat_ehw_causal];
         in_hat_desc=[in_hat_desc_desc,in_hat_desc_causal_sample,in_hat_desc_causal];
-        in_hat_Z=[in_hat_Z_desc,in_hat_Z_causal_sample,in_hat_Z_causal];
-        in_hat_causal_Z=[in_hat_causal_Z_desc,in_hat_causal_Z_causal_sample,in_hat_causal_Z_causal];
+        in_hat_causal_sample=[in_hat_causal_sample_desc,in_hat_causal_sample_causal_sample,in_hat_causal_sample_causal];
+        in_hat_causal=[in_hat_causal_desc,in_hat_causal_causal_sample,in_hat_causal_causal];
         in_hat_boot=[in_hat_boot_desc,in_hat_boot_causal_sample,in_hat_boot_causal];
-        coverage(isim,:)=[in_ehw,in_desc,in_causal_sample,in_causal,in_Z_causal_sample,in_Z_causal,in_hat_ehw,in_hat_desc,in_hat_Z,in_hat_boot,in_hat_causal_Z];
+        coverage(isim,:)=[in_ehw,in_desc,in_causal_sample,in_causal,in_Z_causal_sample,in_Z_causal,in_hat_ehw,in_hat_desc,in_hat_causal_sample,in_hat_boot,in_hat_causal];
         
         if floor(isim/csim)*csim==isim,
            sd=[mean(theta_out(1:isim,1:3));std(theta_out(1:isim,1:3))] 
@@ -289,7 +266,7 @@ for simulation_design=1:7,
            [simulation_design,isim]
         end
         
-    end,
+    end
     
  end
     

@@ -1,24 +1,33 @@
-function se_causal_z=se_causal_z_calc(Y,U,Z,rho)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+function se_causal_z=se_causal_z_calc(Y,X,Z,beta_tilde,rho,N)
 
-% calculating the eicker-huber-white variance for coefficient on X (scalar)
+% This function outputs estimates for several variance estimators given in the paper 
 
-beta=inv([U Z]'*[U Z])*([U Z]'*Y);
-eps=Y-[U Z]*beta;
-Lambda=(inv(Z'*Z)*(Z'*U));
-X=U-Z*Lambda;
-H=X'*X;
+% 1.Calculating the Eicker-Huber-White variance for coefficient on X (scalar)
+
+%eps=Y-[U Z]*beta; NOT CONSISTENT WITH definition on p.22
+
+H=X'*X; %denoted as capital Gamma in the paper 
+eps = Y-[X Z]*beta_tilde %calculating regression residulas 
 Xeps=X.*eps;
-
 G=(inv(Z'*Z)*(Z'*Xeps));
-rsq=(Z*G)'*(Z*G)/(Xeps'*Xeps);
 
-Delta_z=(Xeps-Z*G)'*(Xeps-Z*G);
-Delta_ehw=Xeps'*Xeps;
+Delta_ehw=(Xeps'*Xeps)/N;
+Delta_z=(Xeps-Z*G)'*(Xeps-Z*G)/N;
 Delta_causal_z=rho*Delta_z+(1-rho)*Delta_ehw;
-V_ehw=inv(H)*Delta_ehw*inv(H);
+
+
+V_ehw=inv(H)*Delta_ehw*inv(H); % This is the estimated sqrt(N) variance
+V_desc = (1-rho)*V_ehw;
+V_causal_sample=inv(H)*Delta_z*inv(H);
+V_causal=inv(H)*Delta_causal_z*inv(H);
+
 se_ehw=sqrt(V_ehw);
+se_hat_desc=sqrt(V_desc)
+se_causal_z=sqrt(V_causal_z);
+se_causal_sample_z = sqrt(
+
+
+
 V_z=inv(H)*Delta_z*inv(H);
 V_causal_z=inv(H)*Delta_causal_z*inv(H);
 

@@ -33,7 +33,5 @@ function se_boot=se_boots_calc(Y,X,Z,Nboot,N,se_ehw,theta)
     
     % We find the corresponding standard error that is consistent with our imporved confidence interval. 
     % Since the standard error can uniquely be defined from the boundaries of the confidence interval only under the assumption of normality,
-    % we divide by the critical standard errors under normality.
+    % we divide by the critical values of the t-statistic under normality.
     se_boot=(ucb_boot-lcb_boot)/(2*1.96);
-
-end

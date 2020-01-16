@@ -205,7 +205,7 @@ for simulation_design=1:7
         
         % Sample standard errors
         [se_hat_ehw,se_hat_desc,se_hat_causal_sample,se_hat_causal]=se_calc(YR,XR,ZR,beta_hat,rho_hat,N);
-        se_hat_boot=se_boots_calc(YR,XR,ZR,Nboot,N,se_hat_ehw,hat_theta);
+        se_hat_boot=se_boots_calc(YR,XR,ZR,Nboot,se_hat_ehw,hat_theta);
         
         % Calculating nominal coverage (ie, using (expected) true variances) 
         in_ehw_desc=abs(hat_theta-theta_desc)<1.96*se_ehw;

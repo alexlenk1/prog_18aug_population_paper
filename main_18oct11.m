@@ -187,7 +187,7 @@ for simulation_design=1:7
     coverage=zeros(Nsim,33); % this records coverage rates for all variance-estimator combinations
     
     for isim=1:Nsim
-        [YR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U,n);
+        [YR,ZR,UR,R]=gen_sample(rho,Y,Z,U,n);
         
         N = sum(R); %sample size
         rho_hat = N/n;

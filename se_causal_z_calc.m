@@ -1,4 +1,4 @@
-function [se_ehw,se_desc,se_causal_sample,se_causal]=se_causal_z_calc(Y,X,Z,beta,rho,N)
+function [se_ehw,se_desc,se_causal_sample,se_causal]=se_calc(Y,X,Z,beta,rho,N)
 
 % This function outputs estimates for several variance estimators given in the paper (see p. 22-23) 
 

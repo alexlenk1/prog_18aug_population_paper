@@ -1,4 +1,6 @@
 % This program reproduces the Simulation Table 4 on p.39
+% The rows that appear in the table are the first 3 rows and the last 20 rows of "gtabel" 
+
 % The functions that are called are:
 
 % 1) gen_population.m

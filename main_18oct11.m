@@ -1,7 +1,17 @@
 % This program reproduces the Simulation Table 4 on p.39
 % The functions that are called are:
 
-%
+% 1) gen_population.m
+% Generates population of size n
+
+% 2) gen_sample.m
+% Generates sample of expected size (rho*N) for each simulation
+
+% 3) se_calc.m
+% Calculates estimates for different standard error estimators 
+
+% 4) se_boots_calc.m
+% Calculates improved bootstrapped standard erorrs 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,12 +170,12 @@ for simulation_design=1:7,
     
     % We now calculate the (expected) true standard errors of the estimators (these are no longer sqrt(N)).
     % These are expected true standard errors as we divide by expected rather than true sample size. 
-    se_ehw=sqrt(V_ehw/(rho*n));
-    se_desc=sqrt(V_desc/(rho*n));
-    se_causal_sample=sqrt(V_causal_sample/(rho*n));
-    se_causal=sqrt(V_causal/(rho*n));
-    se_Z_causal_sample=sqrt(V_Z_causal_sample/(rho*n));
-    se_Z_causal=sqrt(V_Z_causal/(rho*n));
+    se_ehw=sqrt(V_ehw/(EN));
+    se_desc=sqrt(V_desc/(EN));
+    se_causal_sample=sqrt(V_causal_sample/(EN));
+    se_causal=sqrt(V_causal/(EN));
+    se_Z_causal_sample=sqrt(V_Z_causal_sample/(EN));
+    se_Z_causal=sqrt(V_Z_causal/(EN));
     
     %Define Matrices for Storing Output from Each Simulation 
     
@@ -191,7 +201,7 @@ for simulation_design=1:7,
         hat_theta=beta(1,1);    % Remember that theta_hat = theta_tilde (where theta_tilde obtained in a regression of YR on UR and ZR)
         
         % Sample standard errors
-        [se_hat_ehw,se_hat_desc,se_hat_causal_sample,se_hat_causal]=se_causal_z_calc(YR,XR,ZR,beta_hat,rho_hat,N);
+        [se_hat_ehw,se_hat_desc,se_hat_causal_sample,se_hat_causal]=se_calc(YR,XR,ZR,beta_hat,rho_hat,N);
         se_hat_boot=se_boots_calc(YR,XR,ZR,Nboot,N,se_hat_ehw,hat_theta);
         
         % Calculating nominal coverage (ie, using (expected) true variances) 
@@ -277,5 +287,5 @@ for simulation_design=1:7,
 tabel
 gtabel=gtable(tabel,3)
 
-
+% Saving Simulation Table
 save tabel_oct11 tabel gtabel

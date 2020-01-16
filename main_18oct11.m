@@ -40,7 +40,7 @@ KZ=2;            % number of fixed characteristics Z, beyond intercept.
 tabel=zeros(39,3);   % matrix containing output for tables
                      % there are seven simulation designs
 
-for simulation_design=1:7,
+for simulation_design=1:7
     if simulation_design==1
        KZ=1;      
        EN=1000;   
@@ -118,7 +118,7 @@ for simulation_design=1:7,
        sig_theta=0;  
     end
     
-    if simulation_design==7,
+    if simulation_design==7
        KZ=1;    
        EN=1000;   
        rho=0.01; 
@@ -187,10 +187,10 @@ for simulation_design=1:7,
     coverage=zeros(Nsim,33); % this records coverage rates for all variance-estimator combinations
     
     for isim=1:Nsim
-        [YR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U);
+        [YR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U,n);
         
-        N = sum(R) %sample size
-        rho_hat = N/n
+        N = sum(R); %sample size
+        rho_hat = N/n;
         
         %Calculating true theta causal sample 
         theta_causal_sample=mean(theta(R,1)); % This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
@@ -272,23 +272,23 @@ for simulation_design=1:7,
         in_hat_boot=[in_hat_boot_desc,in_hat_boot_causal_sample,in_hat_boot_causal];
         coverage(isim,:)=[in_ehw,in_desc,in_causal_sample,in_causal,in_Z_causal_sample,in_Z_causal,in_hat_ehw,in_hat_desc,in_hat_causal_sample,in_hat_boot,in_hat_causal];
         
-        if floor(isim/csim)*csim==isim,
-           sd=[mean(theta_out(1:isim,1:3));std(theta_out(1:isim,1:3))] 
-           cov=mean(coverage(1:isim,:))
-           mean_se=mean(out(1:isim,:))
+        if floor(isim/csim)*csim==isim
+           sd=[mean(theta_out(1:isim,1:3));std(theta_out(1:isim,1:3))]; 
+           cov=mean(coverage(1:isim,:));
+           mean_se=mean(out(1:isim,:));
            
-           tabel(:,simulation_design)=[sd(2,:)';mean_se(1,1);cov(1,1:3)';mean_se(1,2);cov(1,4:6)';mean_se(1,3);cov(1,7:9)';mean_se(1,4);cov(1,10:12)';mean_se(1,7);cov(1,19:21)';mean_se(1,8);cov(1,22:24)';mean_se(1,9);cov(1,25:27)';mean_se(1,10);cov(1,28:30)';mean_se(1,11);cov(1,31:33)']
-           gtabel=gtable(tabel,3)
+           tabel(:,simulation_design)=[sd(2,:)';mean_se(1,1);cov(1,1:3)';mean_se(1,2);cov(1,4:6)';mean_se(1,3);cov(1,7:9)';mean_se(1,4);cov(1,10:12)';mean_se(1,7);cov(1,19:21)';mean_se(1,8);cov(1,22:24)';mean_se(1,9);cov(1,25:27)';mean_se(1,10);cov(1,28:30)';mean_se(1,11);cov(1,31:33)'];
+           gtabel=gtable(tabel,3);
            save tabel_oct11 tabel gtabel simulation_design isim
-           [simulation_design,isim]
+           [simulation_design,isim];
         end
         
     end
     
  end
     
-tabel
-gtabel=gtable(tabel,3)
+tabel;
+gtabel=gtable(tabel,3);
 
 % Saving Simulation Table
 save tabel_oct11 tabel gtabel

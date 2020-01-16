@@ -1,5 +1,5 @@
 
-function       [YR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U)
+function       [YR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U,n)
 
 % This function samples data for the population and creates the sample for each simulation
  

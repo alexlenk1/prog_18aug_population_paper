@@ -141,11 +141,11 @@ for simulation_design=1:7,
     
     theta_causal=mean(theta); % [This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0]
 
-    beta=inv([X Z]'*[X Z])*([X Z]'*Y); % formula (3.3)
+    beta=inv([X Z]'*[X Z])*([X Z]'*Y); % Formula (3.3)
     theta_desc=beta(1,1);    
       
     % We now calculate the true variances of the different estimators.
-    % Notice these are square-root-N variances as on p.18.
+    % Notice these are sqrt(N) variances as on p.18.
     Delta_ehw=1+3*(psi'*psi+sig_theta*sig_theta);
     Delta_Z=Delta_ehw-(psi'*psi);
     Delta_cond=Delta_ehw-(psi'*psi+sig_theta*sig_theta);
@@ -158,7 +158,7 @@ for simulation_design=1:7,
     V_Z_causal_sample=inv(H)*Delta_Z*inv(H);
     V_Z_causal=inv(H)*(rho*Delta_Z+(1-rho)*Delta_ehw)*inv(H);
     
-    % We now calculate the (expected) true standard errors of the estimators (these are no longer square-root-N).
+    % We now calculate the (expected) true standard errors of the estimators (these are no longer sqrt(N)).
     % These are expected true standard errors as we divide by expected rather than true sample size. 
     se_ehw=sqrt(V_ehw/(rho*n));
     se_desc=sqrt(V_desc/(rho*n));
@@ -167,24 +167,28 @@ for simulation_design=1:7,
     se_Z_causal_sample=sqrt(V_Z_causal_sample/(rho*n));
     se_Z_causal=sqrt(V_Z_causal/(rho*n));
     
-    %Define Matrices for Stroring Output from Each Simulation 
+    %Define Matrices for Storing Output from Each Simulation 
     
     theta_out=zeros(Nsim,4);  % this records estimated theta and how it deviates from the 3 theta estimators defined above
     out=zeros(Nsim,11); %  this records different variance estimators (both the true ones and the estimated ones)
     coverage=zeros(Nsim,33); % this records coverage rates for all variance-estimator combinations
     
     for isim=1:Nsim
-        [YR,XR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U);
+        [YR,ZR,UR,R]=gen_sample(rho,Y,X,Z,U);
         
         N = sum(R) %sample size
         rho_hat = N/n
-        theta_causal_sample=mean(theta(R,1)); %This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
         
-        Lambda_hat=(inv(ZR'*ZR)*(ZR'*UR)); % Calculating estimated X (which is U net of correlation with X, see p.11)
+        %Calculating true theta causal sample 
+        theta_causal_sample=mean(theta(R,1)); % This is implied by formula (3.5) since X,Z standard normal and uncorrelated and gamma=0
+        
+        % Calculating estimated X (which is U net of correlation with X, see p.11)
+        Lambda_hat=(inv(ZR'*ZR)*(ZR'*UR));
         XR=UR-ZR*Lambda_hat;
-       
-        beta_hat=inv([XR ZR]'*[XR ZR])*([XR ZR]'*YR); % Calculating theta hat and gamma hat as on p.11
-        hat_theta=beta(1,1);    % Remember that theta_hat = theta_tilde (where theta_hat obtained in a regression of YR on UR and ZR)
+        
+        % Calculating theta hat and gamma hat as on p.11
+        beta_hat=inv([XR ZR]'*[XR ZR])*([XR ZR]'*YR); 
+        hat_theta=beta(1,1);    % Remember that theta_hat = theta_tilde (where theta_tilde obtained in a regression of YR on UR and ZR)
         
         % Sample standard errors
         [se_hat_ehw,se_hat_desc,se_hat_causal_sample,se_hat_causal]=se_causal_z_calc(YR,XR,ZR,beta_hat,rho_hat,N);

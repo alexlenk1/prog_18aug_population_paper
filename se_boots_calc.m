@@ -28,7 +28,7 @@ function se_boot=se_boots_calc(Y,X,Z,Nboot,se_ehw,theta)
     % We calculate the improved critical values for the t-statistic. 
     Tboot=sort(Tboot);
     t975=Tboot(round(Nboot*0.975),1);                   %97.5 percentile of boostrap t-statistic distribution 
-    t025=Tboot(round(Nboot*0.975),1);                   %2.5 percentile of boostrap t-statistic distribution 
+    t025=Tboot(round(Nboot*0.025),1);                   %2.5 percentile of boostrap t-statistic distribution 
     
     % We calculate the improved boundaries of the confidence interval under heteroskedasticity.
     ucb_boot=theta-t025*se_ehw;

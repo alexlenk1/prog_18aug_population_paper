@@ -1,9 +1,12 @@
-function se_boot=se_boots_calc(Y,X,Z,Nboot,N,se_ehw,theta)
+function se_boot=se_boots_calc(Y,X,Z,Nboot,se_ehw,theta)
 
 % This function calculates improved bootstrapped standard errors.
 
+    W=[X,Z];
+    [N,KW]=size(W);
+    
     Tboot=zeros(Nboot,1);
-    for iboot=1:Nboot,
+    for iboot=1:Nboot
         Boot=floor(N*rand(N,1)+1);
         XBoot=X(Boot,:);
         YBoot=Y(Boot,:);
@@ -15,7 +18,7 @@ function se_boot=se_boots_calc(Y,X,Z,Nboot,N,se_ehw,theta)
         betaBoot=iWWBoot*(WBoot'*YBoot);                % least squares coefficient
         thetaBoot=betaBoot(1,1);
         epsBoot=YBoot-WBoot*betaBoot;                   % residual
-        WeBoot=WBoot.*(epBoots*ones(1,KW));
+        WeBoot=WBoot.*(epsBoot*ones(1,KW));
         Var_ehwBoot=iWWBoot*(WeBoot'*WeBoot)*iWWBoot;   % robust variance
         se_ehwBoot=sqrt(Var_ehwBoot(1,1));              % standard error for thetaboot coefficient
         t=thetaBoot/se_ehwBoot;                         % bootstrapped t-statistic

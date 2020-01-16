@@ -13,6 +13,9 @@
 % 4) se_boots_calc.m
 % Calculates improved bootstrapped standard erorrs 
 
+% 5) gtable.m
+% Creates table
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% IMPLEMENTATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

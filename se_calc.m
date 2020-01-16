@@ -18,11 +18,10 @@ function [se_ehw,se_desc,se_causal_sample,se_causal]=se_calc(Y,X,Z,beta,rho,N)
   V_causal=rho*V_causal_sample + (1-rho)*V_ehw;
 
 
-  % We now calculated the estimated variances of the estimators (no longer sqrt(N))
+  % We now calculate the estimated variances of the estimators (no longer sqrt(N))
   se_ehw=sqrt(V_ehw/N);
   se_desc=sqrt(V_desc/N);
   se_causal=sqrt(V_causal/N);
   se_causal_sample = sqrt(V_causal_sample/N);
   
-end
 
